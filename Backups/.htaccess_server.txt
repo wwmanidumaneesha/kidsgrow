@@ -1,0 +1,26 @@
+# Enable Rewrite Engine
+RewriteEngine On
+
+# ✅ 1. Bypass rewrite if "no_rewrite=1" is in query string
+RewriteCond %{QUERY_STRING} (^|&)no_rewrite=1(&|$) [NC]
+RewriteRule .* - [L]
+
+# ✅ 2. Remove .php extension and serve pages (signin → signin.php)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^/.]+)$ $1.php [L]
+
+# ✅ 3. Redirect .php URLs to extensionless URLs (signin.php → signin)
+RewriteCond %{THE_REQUEST} /([^.]+)\.php [NC]
+RewriteRule ^([^.]+)\.php$ /$1 [R=301,L]
+
+# ✅ 4. Fix trailing slash issues (e.g., /folder → /folder/)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^/]+)/$ /$1 [R=301,L]
+
+# ✅ 5. Set index.php as default for directories
+DirectoryIndex index.php
+
+# ✅ 6. Prevent directory listing (security)
+Options -Indexes

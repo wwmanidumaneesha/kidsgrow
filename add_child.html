@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Child</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Roboto, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            background-color: #F4F4F4;
+        }
+        
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            background: linear-gradient(to bottom, #8FC4F1, #274FB4);
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .sidebar h1 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+        
+        .sidebar a i {
+            margin-right: 10px;
+        }
+        
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .form-box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+            width: 700px;
+        }
+        
+        .form-box h2 {
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
+        }
+        
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            width: 45%;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 50%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+
+        .form-group input[type="date"] {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: url('https://img.icons8.com/?size=100&id=WpQIVxfhhzqt&format=png&color=000000') no-repeat right 10px center;
+            background-size: 20px 20px;
+            padding-right: 35px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Hide the default calendar icon in some browsers */
+        .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            position: absolute;
+            right: 10px;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+
+
+
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            width: 50%;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn.cancel {
+            background-color: white;
+            color: #274FB4;
+            border: 2px solid #274FB4;
+        }
+
+        .btn.cancel:hover {
+            background-color: #274FB4;
+            color: white;
+        }
+
+        .btn.save {
+            background-color: #274FB4;
+            color: white;
+        }
+
+        .btn.save:hover {
+            background-color: #1f3a8a;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h1><i class="fas fa-heartbeat" style="padding-right: 6px;"></i>Ministry of Health</h1>
+        <a href="#"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="#"><i class="fas fa-child"></i> Child Profiles</a>
+        <a href="#"><i class="fas fa-users"></i> Parent Profiles</a>
+        <a href="#"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+    </div>
+    <div class="container">
+        <div class="form-box">
+            <h2>Add New Child</h2>
+            <form id="addChildForm" method="POST" action="process_child.php">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Birth Date</label>
+                    <input type="date" name="birth_date" required>
+                </div>
+                <div class="form-group">
+                    <label>Registered Date</label>
+                    <input type="date" name="registered_date" required>
+                </div>
+                <div class="form-group">
+                    <label>Health Medical Officer Division</label>
+                    <input type="text" name="health_medical_officer_division" required>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" step="0.1" name="weight" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="gender" value="Male" required> Male</label>
+                        <label><input type="radio" name="gender" value="Female" required> Female</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Family Health Medical Officer Division</label>
+                    <input type="text" name="family_health_medical_officer_division" required>
+                </div>
+                <div class="form-group">
+                    <label>Supplementary Regional Record Number</label>
+                    <input type="text" name="supplementary_regional_record_number">
+                </div>
+                <div class="form-group">
+                    <label>Grama Niladhari Record Number</label>
+                    <input type="text" name="grama_niladhari_record_number">
+                </div>
+                <div class="form-group">
+                    <label>Birth Hospital</label>
+                    <input type="text" name="birth_hospital" required>
+                </div>
+                <div class="form-group">
+                    <label>Mother's ID</label>
+                    <input type="text" name="mother_id" required>
+                </div>
+                <div class="form-group">
+                    <label>Did start breastfeeding within an hour after delivery?</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="breastfeeding" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="breastfeeding" value="No" required> No</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tested for hypothyroidism?</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="hypothyroidism" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="hypothyroidism" value="No" required> No</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Hypothyroidism Test Result</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="hypothyroidism_result" value="Positive" required> Positive</label>
+                        <label><input type="radio" name="hypothyroidism_result" value="Negative" required> Negative</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Reasons to Preserve</label>
+                    <input type="text" name="reasons_to_preserve">
+                </div>
+                <div class="buttons">
+                    <button type="button" class="btn cancel" onclick="window.location.href='child_profiles.php'">Cancel</button>
+                    <button type="submit" class="btn save">Save</button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</body>
+</html>
+
+

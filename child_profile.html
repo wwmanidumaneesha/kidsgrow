@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>KidsGrow - Child Health Records</title>
+
+  <!-- Use Poppins font -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #274FB4;
+      --secondary-color: #8FC4F1;
+      --text-dark: #333;
+      --text-light: #666;
+      --white: #fff;
+      --border-radius: 8px;
+      --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background-color: #f0f0f0;
+      margin: 0;
+    }
+
+    /* Layout: sidebar fixed, main content scroll */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 220px;
+      background: #274FB4;
+      color: white;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .main-content {
+      margin-left: 220px;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 0 20px 20px 20px;
+      position: relative;
+    }
+
+    /* Sidebar top section (logo & menu) */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+    .logo span {
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      cursor: pointer;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding-left: 10px;
+      border-radius: var(--border-radius);
+    }
+
+    /* User Profile at bottom of sidebar */
+    .sidebar-user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 40px;
+      padding: 10px;
+      background: rgba(255,255,255,0.2);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      position: relative;
+    }
+    .sidebar-user-profile img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .sidebar-user-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .sidebar-user-name {
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .sidebar-user-role {
+      font-weight: 400;
+      font-size: 14px;
+    }
+    .sidebar-user-menu {
+      display: none;
+      position: absolute;
+      bottom: 60px;
+      left: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      min-width: 120px;
+      box-shadow: var(--shadow);
+      padding: 5px 0;
+      color: #333;
+      z-index: 1000;
+    }
+    .sidebar-user-menu a {
+      display: block;
+      padding: 8px 12px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+    }
+    .sidebar-user-menu a:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Search bar area - sticky at top of main content */
+    .search-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: #f0f0f0;
+      padding: 20px 0 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .search-container {
+      position: relative;
+      width: 400px;
+    }
+    .search-container input {
+      width: 100%;
+      padding: 10px 40px 10px 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .search-container .search-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #4a90e2;
+    }
+    .add-child-btn {
+      background-color: #1a47b8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* Child Profiles Box with sticky header */
+    .child-profiles {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    /* Sticky header for the table box */
+    .child-profiles .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fff;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* Scrollable table container */
+    .child-profiles .table-container {
+      max-height: 600px;
+      overflow-y: auto;
+      overflow-x: auto;
+      padding: 20px;
+    }
+    .child-profiles table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+    .child-profiles th, 
+    .child-profiles td {
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .child-profiles th {
+      color: #666;
+      font-weight: 600;
+    }
+    .action-icons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .delete-icon {
+      color: #ff4444 !important;
+    }
+    .default-hidden {
+      display: none;
+    }
+
+    /* Modals & Overlays */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      display: none;
+    }
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--white);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      width: 500px;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+
+    .filter-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .form-control {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #f8f8f8;
+    }
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+    }
+    .radio-option input[type="radio"] {
+      margin-right: 5px;
+    }
+
+    .hide-columns {
+      margin-top: 30px;
+    }
+    .column-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .column-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .checkbox {
+      width: 18px;
+      height: 18px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      background: #f8f8f8;
+    }
+    .button-group {
+      margin-top: 30px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .btn {
+      padding: 8px 24px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .btn-cancel {
+      background: white;
+      border: 1px solid #3366cc;
+      color: #3366cc;
+    }
+    .btn-apply {
+      background: #3366cc;
+      color: white;
+    }
+    .btn-primary {
+      background: #274FB4;
+      color: #fff;
+      border: none;
+    }
+    .btn-secondary {
+      background: #fff;
+      color: #274FB4;
+      border: 1px solid #274FB4;
+    }
+
+    /* Alert Box */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: var(--border-radius);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1001;
+      display: none;
+      animation: slideIn 0.3s ease-out;
+    }
+    .alert-success {
+      background: #28a745;
+    }
+    .alert-error {
+      background: #dc3545;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* View Child Modal */
+    .view-child-modal .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      padding-bottom: 40px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .view-child-modal .child-details {
+      margin-bottom: 20px;
+    }
+    .view-child-modal .detail-row {
+      display: flex;
+      padding: 8px 0;
+    }
+    .view-child-modal .detail-row span:first-child {
+      width: 250px;
+      font-weight: 500;
+    }
+    .view-child-modal .section-title {
+      font-weight: 600;
+      font-size: 16px;
+      margin: 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      border: 1px solid #c8d6e5;
+      padding: 10px;
+      border-radius: 5px 5px 0 0;
+      background-color: #e3eaf2;
+    }
+    .view-child-modal .section-content {
+      display: none;
+      border: 1px solid #c8d6e5;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      padding: 15px;
+      background-color: #f1f6fb;
+    }
+    .view-child-modal .health-chart {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .view-child-modal .health-chart th,
+    .view-child-modal .health-chart td {
+      border: 1px solid #c8d6e5;
+      padding: 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .view-child-modal .close-btn {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 10px 30px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 50px;
+      margin-bottom: 20px;
+      float: right;
+    }
+
+    /* BMI Chart */
+    .bmi-chart-container {
+      margin-top: 30px;
+      background: #fff;
+      border: 1px solid #c8d6e5;
+      border-radius: 5px;
+      padding: 15px;
+    }
+    .bmi-chart-container h3 {
+      margin-bottom: 15px;
+      font-size: 16px;
+      color: #333;
+      text-align: center;
+      font-weight: 600;
+    }
+    canvas#bmiChart {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+      <div>
+          <!-- Logo & Navigation -->
+          <div class="logo">
+              <i class="fas fa-child" style="font-size: 24px;"></i>
+              <span>KidsGrow</span>
+          </div>
+          <a href="#" class="menu-item">
+              <i class="fas fa-th-large"></i>
+              <span>Dashboard</span>
+          </a>
+          <a href="#" class="menu-item">
+              <i class="fas fa-child"></i>
+              <span>Child Profiles</span>
+          </a>
+          <a href="#" class="menu-item">
+              <i class="fas fa-users"></i>
+              <span>Parent Profiles</span>
+          </a>
+          <a href="#" class="menu-item">
+              <i class="fas fa-syringe"></i>
+              <span>Vaccination</span>
+          </a>
+          <a href="#" class="menu-item">
+              <i class="fas fa-home"></i>
+              <span>Home Visit</span>
+          </a>
+          <a href="#" class="menu-item">
+              <i class="fas fa-box"></i>
+              <span>Thriposha Distribution</span>
+          </a>
+          <a href="#" class="menu-item">
+              <i class="fas fa-chart-line"></i>
+              <span>Growth Details</span>
+          </a>
+          <!-- Additional link for SuperAdmin (dummy) -->
+          <a href="#" class="menu-item">
+              <i class="fas fa-user-shield"></i>
+              <span>Add Admin</span>
+          </a>
+      </div>
+      <!-- User Profile at Bottom -->
+      <div class="sidebar-user-profile" id="sidebarUserProfile">
+          <img src="https://placehold.co/45x45" alt="User">
+          <div class="sidebar-user-info">
+              <span class="sidebar-user-name">Sarah Smith</span>
+              <span class="sidebar-user-role">Doctor</span>
+          </div>
+          <div class="sidebar-user-menu" id="sidebarUserMenu">
+              <a href="#">Sign Out</a>
+          </div>
+      </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+      <!-- Top bar with search and add child -->
+      <div class="search-bar">
+          <div class="search-container">
+              <input type="text" id="searchInput" placeholder="Search by name or hospital...">
+              <i class="fas fa-search search-icon"></i>
+          </div>
+          <button class="add-child-btn" id="openAddChildModal">
+              <i class="fas fa-plus"></i> Add Child
+          </button>
+      </div>
+
+      <!-- Child Profiles Table with sticky header -->
+      <div class="child-profiles">
+          <div class="sticky-header">
+              <h2>Child Profiles</h2>
+              <i class="fas fa-filter filter-icon" id="tableFilterIcon"></i>
+          </div>
+          <div class="table-container">
+              <table>
+                  <thead>
+                      <tr>
+                          <th>Child ID</th>
+                          <th>Name</th>
+                          <th>Date of Birth</th>
+                          <th>Registered Date</th>
+                          <th>Health Division</th>
+                          <th>Family Health Division</th>
+                          <th>Mother's ID</th>
+                          <th>Birth Hospital</th>
+                          <th>Weight</th>
+                          <th>Height</th>
+                          <th>Gender</th>
+                          <th>Supplementary Record</th>
+                          <th>GN Record</th>
+                          <th class="default-hidden" data-col="breastfeeding_within_1h">Breastfeeding Within 1 Hour</th>
+                          <th class="default-hidden" data-col="congenital_hypothyroidism_check">Hypothyroidism Check</th>
+                          <th class="default-hidden" data-col="hypothyroidism_test_results">Hypothyroidism Result</th>
+                          <th class="default-hidden" data-col="reasons_to_preserve">Reasons To Preserve</th>
+                          <th class="default-hidden" data-col="breastfeeding_only_2m">Only Breastfeeding At 2m</th>
+                          <th class="default-hidden" data-col="breastfeeding_only_4m">Only Breastfeeding At 4m</th>
+                          <th class="default-hidden" data-col="breastfeeding_only_6m">Only Breastfeeding At 6m</th>
+                          <th class="default-hidden" data-col="start_feeding_other_foods">Started Feeding Other Foods</th>
+                          <th class="default-hidden" data-col="age_started_feeding_other_foods">Age Started Feeding</th>
+                          <th class="default-hidden" data-col="age_stopped_breastfeeding">Age Stopped Breastfeeding</th>
+                          <th class="default-hidden" data-col="other_foods_at_1_year">Other Foods At 1 Year</th>
+                          <th class="default-hidden" data-col="started_feeding_other_foods_4m">Started Feeding Other Foods At 4m</th>
+                          <th class="default-hidden" data-col="started_feeding_other_foods_6m">Started Feeding Other Foods At 6m</th>
+                          <th>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody id="tableBody">
+                      <!-- Dummy row for design -->
+                      <tr data-id="1">
+                          <td>1</td>
+                          <td>John Doe</td>
+                          <td>2020-01-15</td>
+                          <td>2020-01-20</td>
+                          <td>Division A</td>
+                          <td>Division X</td>
+                          <td>1001</td>
+                          <td>City Hospital</td>
+                          <td>3.5</td>
+                          <td>1.2</td>
+                          <td>Male</td>
+                          <td>SR123</td>
+                          <td>GN456</td>
+                          <td class="default-hidden" data-col="breastfeeding_within_1h">Yes</td>
+                          <td class="default-hidden" data-col="congenital_hypothyroidism_check">No</td>
+                          <td class="default-hidden" data-col="hypothyroidism_test_results">-</td>
+                          <td class="default-hidden" data-col="reasons_to_preserve">-</td>
+                          <td class="default-hidden" data-col="breastfeeding_only_2m">Yes</td>
+                          <td class="default-hidden" data-col="breastfeeding_only_4m">No</td>
+                          <td class="default-hidden" data-col="breastfeeding_only_6m">No</td>
+                          <td class="default-hidden" data-col="start_feeding_other_foods">Yes</td>
+                          <td class="default-hidden" data-col="age_started_feeding_other_foods">4</td>
+                          <td class="default-hidden" data-col="age_stopped_breastfeeding">8</td>
+                          <td class="default-hidden" data-col="other_foods_at_1_year">No</td>
+                          <td class="default-hidden" data-col="started_feeding_other_foods_4m">No</td>
+                          <td class="default-hidden" data-col="started_feeding_other_foods_6m">Yes</td>
+                          <td class="action-icons">
+                              <i class="fas fa-eye view-btn"></i>
+                              <i class="fas fa-edit edit-btn"></i>
+                              <i class="fas fa-trash delete-icon delete-btn" data-id="1"></i>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <!-- Update Modal -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal" id="editModal">
+      <h2>Update Child</h2>
+      <form id="editForm">
+          <input type="hidden" id="editChildId">
+          <div class="form-group">
+              <label>Child Name</label>
+              <input type="text" class="form-control" id="editChildName" readonly>
+          </div>
+          <div class="form-group">
+              <label>Health Division</label>
+              <input type="text" class="form-control" id="editHealthDivision">
+          </div>
+          <div class="form-group">
+              <label>Family Health Division</label>
+              <input type="text" class="form-control" id="editFamilyHealthDivision">
+          </div>
+          <div class="form-group">
+              <label>Supplementary Record</label>
+              <input type="text" class="form-control" id="editSupplementaryRecord">
+          </div>
+          <div class="form-group">
+              <label>GN Record</label>
+              <input type="text" class="form-control" id="editGnRecord">
+          </div>
+          <div class="form-group">
+              <label>Weight (kg)</label>
+              <input type="number" step="0.1" class="form-control" id="editChildWeight">
+          </div>
+          <div class="form-group">
+              <label>Height (m)</label>
+              <input type="number" step="0.01" class="form-control" id="editChildHeight">
+          </div>
+          <div class="form-group">
+              <label>Only Breastfeeding at 2 Months?</label>
+              <div class="radio-group">
+                  <label><input type="radio" name="breast2" id="editBreast2Yes" value="Yes"> Yes</label>
+                  <label><input type="radio" name="breast2" id="editBreast2No" value="No"> No</label>
+              </div>
+          </div>
+          <div class="form-group">
+              <label>Only Breastfeeding at 4 Months?</label>
+              <div class="radio-group">
+                  <label><input type="radio" name="breast4" id="editBreast4Yes" value="Yes"> Yes</label>
+                  <label><input type="radio" name="breast4" id="editBreast4No" value="No"> No</label>
+              </div>
+          </div>
+          <div class="button-group">
+              <button type="button" class="btn btn-secondary" id="cancelEdit">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+      </form>
+  </div>
+
+  <!-- Add Child Modal -->
+  <div class="modal-overlay" id="addChildModalOverlay"></div>
+  <div class="modal" id="addChildModal">
+      <h2 class="filter-title">ADD NEW CHILD</h2>
+      <form id="addChildForm">
+          <div class="form-grid">
+              <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" class="form-control" name="name" required>
+              </div>
+              <div class="form-group">
+                  <label>Birth Date</label>
+                  <input type="date" class="form-control" name="birth_date" required>
+              </div>
+              <div class="form-group">
+                  <label>Registered Date</label>
+                  <input type="date" class="form-control" name="registered_date" required>
+              </div>
+              <div class="form-group">
+                  <label>Health Division</label>
+                  <input type="text" class="form-control" name="health_medical_officer_division" required>
+              </div>
+              <div class="form-group">
+                  <label>Weight (kg)</label>
+                  <input type="number" step="0.1" class="form-control" name="weight" required>
+              </div>
+              <div class="form-group">
+                  <label>Height (m)</label>
+                  <input type="number" step="0.01" class="form-control" name="height">
+              </div>
+              <div class="form-group">
+                  <label>Gender</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" id="addGenderMale" name="gender" value="Male" required>
+                          <label for="addGenderMale">Male</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" id="addGenderFemale" name="gender" value="Female" required>
+                          <label for="addGenderFemale">Female</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label>Family Health Division</label>
+                  <input type="text" class="form-control" name="family_health_medical_officer_division" required>
+              </div>
+              <div class="form-group">
+                  <label>Supplementary Record</label>
+                  <input type="text" class="form-control" name="supplementary_regional_record_number">
+              </div>
+              <div class="form-group">
+                  <label>GN Record</label>
+                  <input type="text" class="form-control" name="grama_niladhari_record_number">
+              </div>
+              <div class="form-group">
+                  <label>Birth Hospital</label>
+                  <input type="text" class="form-control" name="birth_hospital" required>
+              </div>
+              <div class="form-group">
+                  <label>Mother's ID</label>
+                  <input type="text" class="form-control" name="mother_id" required>
+              </div>
+              <div class="form-group">
+                  <label>Start Breastfeeding Within 1 Hour?</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" id="addBreastfeedingYes" name="breastfeeding" value="Yes" required>
+                          <label for="addBreastfeedingYes">Yes</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" id="addBreastfeedingNo" name="breastfeeding" value="No" required>
+                          <label for="addBreastfeedingNo">No</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label>Test for Hypothyroidism?</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" id="addHypothyroidismYes" name="hypothyroidism" value="Yes" required>
+                          <label for="addHypothyroidismYes">Yes</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" id="addHypothyroidismNo" name="hypothyroidism" value="No" required>
+                          <label for="addHypothyroidismNo">No</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label>Hypothyroidism Test Result</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" id="addHypothyroidismPositive" name="hypothyroidism_result" value="Positive" required>
+                          <label for="addHypothyroidismPositive">Positive</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" id="addHypothyroidismNegative" name="hypothyroidism_result" value="Negative" required>
+                          <label for="addHypothyroidismNegative">Negative</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label>Reasons to Preserve</label>
+                  <input type="text" class="form-control" name="reasons_to_preserve">
+              </div>
+          </div>
+          <div class="button-group">
+              <button type="button" class="btn btn-cancel" id="cancelAddChild">Cancel</button>
+              <button type="submit" class="btn btn-apply">Save</button>
+          </div>
+      </form>
+  </div>
+
+  <!-- Filter Modal -->
+  <div class="modal-overlay" id="filterModalOverlay"></div>
+  <div class="modal" id="filterModal">
+      <h2 class="filter-title">FILTER CHILD DETAILS</h2>
+      <form id="filterForm">
+          <div class="form-grid">
+              <div class="form-group">
+                  <label>Child ID</label>
+                  <input type="text" class="form-control" name="child_id">
+              </div>
+              <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" class="form-control" name="name">
+              </div>
+              <div class="form-group">
+                  <label>Date of Birth</label>
+                  <input type="date" class="form-control" name="birth_date">
+              </div>
+              <div class="form-group">
+                  <label>Weight</label>
+                  <input type="text" class="form-control" name="weight">
+              </div>
+              <div class="form-group">
+                  <label>Gender</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" name="gender" id="filterMale" value="Male">
+                          <label for="filterMale">Male</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" name="gender" id="filterFemale" value="Female">
+                          <label for="filterFemale">Female</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label>Birth Hospital</label>
+                  <input type="text" class="form-control" name="birth_hospital">
+              </div>
+              <div class="form-group">
+                  <label>Health Division</label>
+                  <input type="text" class="form-control" name="health_division">
+              </div>
+              <div class="form-group">
+                  <label>Family Health Division</label>
+                  <input type="text" class="form-control" name="family_health_division">
+              </div>
+              <div class="form-group">
+                  <label>Mother's ID</label>
+                  <input type="text" class="form-control" name="parent_id">
+              </div>
+              <div class="form-group">
+                  <label>Start Breastfeeding Within 1 Hour?</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" name="breastfeeding" id="filterBreastYes" value="Yes">
+                          <label for="filterBreastYes">Yes</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" name="breastfeeding" id="filterBreastNo" value="No">
+                          <label for="filterBreastNo">No</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label>Test for Hypothyroidism?</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" name="tested" id="filterTestedYes" value="Yes">
+                          <label for="filterTestedYes">Yes</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" name="tested" id="filterTestedNo" value="No">
+                          <label for="filterTestedNo">No</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label>Hypothyroidism Test Result</label>
+                  <div class="radio-group">
+                      <div class="radio-option">
+                          <input type="radio" name="result" id="filterResultPositive" value="Positive">
+                          <label for="filterResultPositive">Positive</label>
+                      </div>
+                      <div class="radio-option">
+                          <input type="radio" name="result" id="filterResultNegative" value="Negative">
+                          <label for="filterResultNegative">Negative</label>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Hide Columns Section -->
+          <div class="hide-columns">
+              <h3 class="filter-title">HIDE COLUMNS</h3>
+              <div class="column-list">
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_breastfeeding_within_1h" value="breastfeeding_within_1h" checked>
+                      <span>Breastfeeding Within 1 Hour</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_congenital_hypothyroidism_check" value="congenital_hypothyroidism_check" checked>
+                      <span>Hypothyroidism Check</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_hypothyroidism_test_results" value="hypothyroidism_test_results" checked>
+                      <span>Hypothyroidism Result</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_reasons_to_preserve" value="reasons_to_preserve" checked>
+                      <span>Reasons To Preserve</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_breastfeeding_only_2m" value="breastfeeding_only_2m" checked>
+                      <span>Only Breastfeeding At 2m</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_breastfeeding_only_4m" value="breastfeeding_only_4m" checked>
+                      <span>Only Breastfeeding At 4m</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_breastfeeding_only_6m" value="breastfeeding_only_6m" checked>
+                      <span>Only Breastfeeding At 6m</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_start_feeding_other_foods" value="start_feeding_other_foods" checked>
+                      <span>Started Feeding Other Foods</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_age_started_feeding_other_foods" value="age_started_feeding_other_foods" checked>
+                      <span>Age Started Feeding</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_age_stopped_breastfeeding" value="age_stopped_breastfeeding" checked>
+                      <span>Age Stopped Breastfeeding</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_other_foods_at_1_year" value="other_foods_at_1_year" checked>
+                      <span>Other Foods At 1 Year</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_started_feeding_other_foods_4m" value="started_feeding_other_foods_4m" checked>
+                      <span>Started Feeding Other Foods At 4m</span>
+                  </div>
+                  <div class="column-item">
+                      <input type="checkbox" class="checkbox hide-col" name="hide_started_feeding_other_foods_6m" value="started_feeding_other_foods_6m" checked>
+                      <span>Started Feeding Other Foods At 6m</span>
+                  </div>
+              </div>
+          </div>
+          <div class="button-group">
+              <button type="button" class="btn btn-cancel" id="cancelFilter">Cancel</button>
+              <button type="submit" class="btn btn-apply">Apply</button>
+          </div>
+      </form>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteConfirmModalOverlay"></div>
+  <div class="modal" id="deleteConfirmModal">
+      <h2>Confirm Delete</h2>
+      <p>Are you sure you want to delete this record?</p>
+      <div class="button-group">
+           <button type="button" class="btn btn-secondary" id="cancelDelete">Cancel</button>
+           <button type="button" class="btn btn-primary" id="confirmDelete">Delete</button>
+      </div>
+  </div>
+
+  <!-- VIEW CHILD DETAILS MODAL -->
+  <div class="modal-overlay" id="viewChildModalOverlay"></div>
+  <div class="modal view-child-modal" id="viewChildModal">
+      <div class="card">
+          <h2>Child Details</h2>
+          <div><strong>Child ID:</strong> <span id="viewChildId">1</span></div>
+          <div class="child-details">
+              <div class="detail-row">
+                  <span>Name</span>
+                  <span id="viewChildName">John Doe</span>
+              </div>
+              <div class="detail-row">
+                  <span>Date of Birth</span>
+                  <span id="viewBirthDate">2020-01-15</span>
+              </div>
+              <div class="detail-row">
+                  <span>Registered Date</span>
+                  <span id="viewRegisteredDate">2020-01-20</span>
+              </div>
+              <div class="detail-row">
+                  <span>Health Division</span>
+                  <span id="viewHealthDivision">Division A</span>
+              </div>
+              <div class="detail-row">
+                  <span>Family Health Division</span>
+                  <span id="viewFamilyHealthDivision">Division X</span>
+              </div>
+              <div class="detail-row">
+                  <span>Mother's ID</span>
+                  <span id="viewParentId">1001</span>
+              </div>
+              <div class="detail-row">
+                  <span>Birth Hospital</span>
+                  <span id="viewBirthHospital">City Hospital</span>
+              </div>
+              <div class="detail-row">
+                  <span>Birth Weight</span>
+                  <span id="viewWeight">3.5</span>
+              </div>
+              <div class="detail-row">
+                  <span>Height</span>
+                  <span id="viewHeight">1.2</span>
+              </div>
+              <div class="detail-row">
+                  <span>Gender</span>
+                  <span id="viewGender">Male</span>
+              </div>
+              <div class="detail-row">
+                  <span>Supplementary Record</span>
+                  <span id="viewSupplementary">SR123</span>
+              </div>
+              <div class="detail-row">
+                  <span>GN Record</span>
+                  <span id="viewGnRecord">GN456</span>
+              </div>
+          </div>
+
+          <div class="section-title">
+              More Information <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="section-content">
+              <div class="detail-row">
+                  <span>Breastfeeding within 1 Hour?</span>
+                  <span id="viewBreastfeeding">Yes</span>
+              </div>
+              <div class="detail-row">
+                  <span>Hypothyroidism Check?</span>
+                  <span id="viewHypothyroidism">No</span>
+              </div>
+              <div class="detail-row">
+                  <span>Hypothyroidism Test Result</span>
+                  <span id="viewHypothyroidismResult">-</span>
+              </div>
+              <div class="detail-row">
+                  <span>Reasons to Preserve</span>
+                  <span id="viewReasons">-</span>
+              </div>
+              <div class="detail-row">
+                  <span>Only Breastfeeding at 2m?</span>
+                  <span id="viewBreastfeeding2m">Yes</span>
+              </div>
+              <div class="detail-row">
+                  <span>Only Breastfeeding at 4m?</span>
+                  <span id="viewBreastfeeding4m">No</span>
+              </div>
+              <div class="detail-row">
+                  <span>Only Breastfeeding at 6m?</span>
+                  <span id="viewBreastfeeding6m">No</span>
+              </div>
+              <div class="detail-row">
+                  <span>Started Complementary Foods at 4m?</span>
+                  <span id="viewStartFeeding4m">Yes</span>
+              </div>
+              <div class="detail-row">
+                  <span>Started Complementary Foods at 6m?</span>
+                  <span id="viewStartFeeding6m">No</span>
+              </div>
+              <div class="detail-row">
+                  <span>Age Stopped Breastfeeding</span>
+                  <span id="viewAgeStoppedFeeding">8</span>
+              </div>
+              <div class="detail-row">
+                  <span>Other Foods at 1 Year?</span>
+                  <span id="viewOtherFoods">No</span>
+              </div>
+          </div>
+
+          <div class="section-title">
+              Health Chart <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="section-content">
+              <table class="health-chart">
+                  <tr>
+                      <th></th>
+                      <th>1 - 5 Days</th>
+                      <th>6 - 10 Days</th>
+                      <th>14 - 21 Days</th>
+                      <th>Within 42 Days</th>
+                  </tr>
+                  <tr>
+                      <td>Date</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Skin Color</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Eyes</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Navel Characteristics</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Temperature</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Exclusive Breastfeeding</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Attachment & Relationship</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Stool Color</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+                  <tr>
+                      <td>Complications</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                      <td>...</td>
+                  </tr>
+              </table>
+          </div>
+
+          <!-- BMI Growth Chart Section -->
+          <div class="bmi-chart-container">
+              <h3>BMI Growth Chart</h3>
+              <canvas id="bmiChart"></canvas>
+          </div>
+
+          <button class="close-btn" id="closeViewChild">Close</button>
+      </div>
+  </div>
+  <!-- Alert Box -->
+  <div class="alert" id="alertBox"></div>
+
+  <!-- jQuery and Script -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Toggle user menu in the sidebar
+    function toggleSidebarUserMenu() {
+      const menu = document.getElementById('sidebarUserMenu');
+      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    $(document).ready(function(){
+      // Sidebar user menu toggle
+      $('#sidebarUserProfile').on('click', function(e){
+        e.stopPropagation();
+        toggleSidebarUserMenu();
+      });
+      $(document).on('click', function(){
+        $('#sidebarUserMenu').hide();
+      });
+
+      // Toggle Filter Modal
+      $("#tableFilterIcon").click(function(){
+          $("#filterModalOverlay, #filterModal").fadeIn();
+      });
+      $("#cancelFilter").click(function(){
+          $("#filterModalOverlay, #filterModal").fadeOut();
+      });
+      
+      // Toggle Add Child Modal
+      $("#openAddChildModal").click(function(){
+          $("#addChildModalOverlay, #addChildModal").fadeIn();
+      });
+      $("#cancelAddChild").click(function(){
+          $("#addChildModalOverlay, #addChildModal").fadeOut();
+      });
+      
+      // Dummy AJAX search simulation
+      $("#searchInput").on("input", function(){
+          // Simulate search functionality for design sharing
+          console.log("Searching...");
+      });
+      
+      // Delete Confirmation Modal
+      $(document).on("click", ".delete-btn", function(){
+          let childId = $(this).data("id");
+          $("#deleteConfirmModal").data("childId", childId);
+          $("#deleteConfirmModalOverlay, #deleteConfirmModal").fadeIn();
+      });
+      $("#cancelDelete").click(function(){
+          $("#deleteConfirmModalOverlay, #deleteConfirmModal").fadeOut();
+      });
+      $("#confirmDelete").click(function(){
+          // Simulate delete action
+          showAlert("success", "Record deleted successfully!");
+          $("#deleteConfirmModalOverlay, #deleteConfirmModal").fadeOut();
+      });
+      
+      // Open Edit Modal
+      $(document).on("click", ".edit-btn", function(){
+          // Populate with dummy data for design sharing
+          $("#editChildId").val("1");
+          $("#editChildName").val("John Doe");
+          $("#editHealthDivision").val("Division A");
+          $("#editFamilyHealthDivision").val("Division X");
+          $("#editSupplementaryRecord").val("SR123");
+          $("#editGnRecord").val("GN456");
+          $("#editChildWeight").val("3.5");
+          $("#editChildHeight").val("1.2");
+          $("#editBreast2Yes").prop("checked", true);
+          $("#editBreast4No").prop("checked", true);
+          $("#modalOverlay, #editModal").fadeIn();
+      });
+      $("#cancelEdit").click(function(){
+          $("#modalOverlay, #editModal").fadeOut();
+      });
+      $("#editForm").submit(function(e){
+          e.preventDefault();
+          showAlert("success", "Child record updated successfully!");
+          $("#modalOverlay, #editModal").fadeOut();
+      });
+      
+      // Add Child Form Submission (dummy)
+      $("#addChildForm").submit(function(e){
+          e.preventDefault();
+          showAlert("success", "Child record added successfully!");
+          $("#addChildModalOverlay, #addChildModal").fadeOut();
+      });
+      
+      // View Child Modal logic
+      $(document).on("click", ".view-btn", function(){
+          // Populate modal with dummy data
+          $("#viewChildId").text("1");
+          $("#viewChildName").text("John Doe");
+          $("#viewBirthDate").text("2020-01-15");
+          $("#viewRegisteredDate").text("2020-01-20");
+          $("#viewHealthDivision").text("Division A");
+          $("#viewFamilyHealthDivision").text("Division X");
+          $("#viewParentId").text("1001");
+          $("#viewBirthHospital").text("City Hospital");
+          $("#viewWeight").text("3.5");
+          $("#viewHeight").text("1.2");
+          $("#viewGender").text("Male");
+          $("#viewSupplementary").text("SR123");
+          $("#viewGnRecord").text("GN456");
+          $("#viewBreastfeeding").text("Yes");
+          $("#viewHypothyroidism").text("No");
+          $("#viewHypothyroidismResult").text("-");
+          $("#viewReasons").text("-");
+          $("#viewBreastfeeding2m").text("Yes");
+          $("#viewBreastfeeding4m").text("No");
+          $("#viewBreastfeeding6m").text("No");
+          $("#viewStartFeeding4m").text("Yes");
+          $("#viewStartFeeding6m").text("No");
+          $("#viewAgeStoppedFeeding").text("8");
+          $("#viewOtherFoods").text("No");
+          $("#viewChildModalOverlay, #viewChildModal").fadeIn();
+          fetchBMIDataForChart("1");
+      });
+      $(".view-child-modal .section-title").click(function(){
+          $(this).next(".section-content").slideToggle();
+          $(this).find("i").toggleClass("fa-chevron-down fa-chevron-up");
+      });
+      $("#closeViewChild, #viewChildModalOverlay").click(function(){
+          $("#viewChildModalOverlay, #viewChildModal").fadeOut();
+      });
+      
+      // Alert Function
+      function showAlert(type, message){
+          let alertBox = $("#alertBox");
+          alertBox.removeClass("alert-success alert-error");
+          alertBox.addClass(type === "success" ? "alert-success" : "alert-error");
+          alertBox.text(message).fadeIn();
+          setTimeout(function(){ alertBox.fadeOut(); }, 3000);
+      }
+
+      // Dummy BMI Chart using Chart.js
+      let bmiChart = null;
+      function fetchBMIDataForChart(childId) {
+        // Dummy data for demonstration
+        let bmiData = [
+          { recorded_at: new Date().toISOString(), bmi: 15 },
+          { recorded_at: new Date(Date.now()-86400000).toISOString(), bmi: 14.8 },
+          { recorded_at: new Date(Date.now()-2*86400000).toISOString(), bmi: 14.9 }
+        ];
+        let labels = bmiData.map(entry => {
+          let d = new Date(entry.recorded_at);
+          return d.toLocaleDateString();
+        });
+        let bmiValues = bmiData.map(entry => entry.bmi);
+        let ctx = document.getElementById("bmiChart").getContext("2d");
+        if (bmiChart instanceof Chart) {
+          bmiChart.destroy();
+        }
+        bmiChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "BMI Over Time",
+              data: bmiValues,
+              borderColor: "blue",
+              borderWidth: 2,
+              fill: false
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: { title: { display: true, text: "Date" } },
+              y: { title: { display: true, text: "BMI" }, beginAtZero: false }
+            }
+          }
+        });
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      const userProfile = document.getElementById('sidebarUserProfile');
+      const userMenu = document.getElementById('sidebarUserMenu');
+      if (!userProfile.contains(e.target)) {
+        userMenu.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
